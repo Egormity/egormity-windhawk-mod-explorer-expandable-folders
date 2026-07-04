@@ -11,15 +11,17 @@ namespace meaning.
 
 ## Current Implementation
 
-The repository currently contains only the injectable scaffold:
+The repository currently contains the first Explorer-hosted UI scaffold:
 
 - Windhawk metadata;
 - `explorer.exe` target;
 - x64 architecture target;
-- visible `enabled` checkbox;
-- init/settings/uninit logging.
+- Explorer-hosted `Expandable folders` checkbox;
+- blank overlay child window over the file-list pane when enabled;
+- local Windhawk value storage for the checkbox state;
+- init/uninit lifecycle logging.
 
-No Explorer hooks exist yet.
+No real Explorer file-tree logic exists yet.
 
 ## Rejected Approach
 
@@ -83,7 +85,7 @@ Because the mod runs inside `explorer.exe`, failures are user-visible.
 
 Required safety features for future work:
 
-- global kill switch through the existing `enabled` setting;
+- global kill switch through the existing Explorer-hosted checkbox;
 - strict fallback to native Explorer view;
 - small hooks and guarded probes;
 - no blocking work on Explorer's UI thread;

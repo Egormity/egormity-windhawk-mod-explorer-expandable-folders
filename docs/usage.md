@@ -1,18 +1,19 @@
 # Usage
 
-This document describes how to use the current scaffold. It does not implement
-expandable folders yet.
+This document describes how to use the current Explorer-hosted scaffold. It does
+not implement real expandable folders yet.
 
 ## What To Expect
 
 When installed and enabled in Windhawk, the mod should:
 
 - inject into `explorer.exe`;
-- show a settings checkbox named `Enable expandable folders scaffold`;
-- log whether that checkbox is enabled;
+- show an `Expandable folders` checkbox inside each visible File Explorer window;
+- cover the native file-list pane with an empty view when the checkbox is checked;
+- show the native file-list pane again when unchecked;
 - unload cleanly.
 
-It should not change File Explorer visually yet.
+It should not display real expandable folders yet.
 
 ## Install Through Windhawk UI
 
@@ -32,31 +33,33 @@ It should not change File Explorer visually yet.
 
 6. Open or restart File Explorer.
 
-7. Check Windhawk logs for a message similar to:
+7. In File Explorer, use the `Expandable folders` checkbox.
+
+8. Check Windhawk logs for a message similar to:
 
    ```text
-   Explorer Expandable Folders initialized: enabled=1
+   Explorer Expandable Folders initialized: explorer checkbox=0
    ```
 
 ## Checkbox
 
-The visible Windhawk checkbox is:
+The visible checkbox is in File Explorer:
 
 ```text
-Enable expandable folders scaffold
+Expandable folders
 ```
 
-It controls the setting:
+It controls the persisted local value:
 
 ```text
-enabled
+explorerViewEnabled
 ```
 
 Current behavior:
 
-- checked: logs `enabled=1`;
-- unchecked: logs `enabled=0`;
-- future behavior: all Explorer logic should be skipped when unchecked.
+- checked: a blank child window overlays the native file-list pane;
+- unchecked: the overlay is hidden and the native file-list pane is visible;
+- the same state is synchronized across visible Explorer windows.
 
 ## Direct Install Status
 

@@ -1,29 +1,44 @@
 # Roadmap
 
-## Phase 0: Scaffold
+## Phase 0: Injectable Scaffold
 
 Status: done.
 
 - Create Windhawk source file.
 - Target `explorer.exe`.
 - Add x64 architecture metadata.
-- Add visible `enabled` checkbox.
+- Add initial Windhawk settings checkbox.
 - Log init, settings changes, and uninit.
 - Verify syntax and temporary DLL build.
 
-## Phase 1: Explorer Host Probe
+## Phase 1: Explorer-Hosted Control
 
-Goal: prove safe Explorer integration without changing file behavior.
+Status: initial version done.
 
-- Detect supported Explorer windows.
+- Detect visible `CabinetWClass` Explorer windows.
+- Add an `Expandable folders` checkbox to each Explorer window.
+- Store checkbox state in Windhawk local storage.
+- Create and resize a blank child `HWND` over the native file-list pane.
+- Hide the overlay when unchecked.
+- Remove controls cleanly on unload.
+
+Remaining hardening:
+
+- Replace fixed pane offsets with reliable native view detection.
+- Handle tab/layout changes more precisely.
+- Improve light/dark theme matching.
+
+## Phase 2: Explorer Host Probe Hardening
+
+Goal: make the host layer reliable before real tree logic.
+
+- Detect supported Explorer windows and tabs.
 - Detect tab/window lifetime.
-- Find the file-list/content area.
-- Create and resize a harmless child `HWND`.
-- Hide/remove it cleanly on unload.
-- Keep all behavior behind the `enabled` checkbox.
+- Find the file-list/content area from real child windows or Shell interfaces.
+- Keep behavior behind the Explorer-hosted checkbox.
 - Fall back silently when unsupported.
 
-## Phase 2: Standalone Model
+## Phase 3: Standalone Model
 
 Goal: implement the logic outside Explorer internals.
 
@@ -36,7 +51,7 @@ Goal: implement the logic outside Explorer internals.
 - Parent/child selection normalization.
 - Unit tests for model behavior once a test harness exists.
 
-## Phase 3: Virtual Tree-Grid
+## Phase 4: Virtual Tree-Grid
 
 Goal: render a Finder-like details view without creating thousands of controls.
 
@@ -50,7 +65,7 @@ Goal: render a Finder-like details view without creating thousands of controls.
 - Multi-select.
 - Focus and hover states.
 
-## Phase 4: Shell Bridge
+## Phase 5: Shell Bridge
 
 Goal: operate on real Shell identities.
 
@@ -61,7 +76,7 @@ Goal: operate on real Shell identities.
 - Delegate copy, move, rename, and delete to Shell APIs.
 - Begin drag/drop through Shell data objects.
 
-## Phase 5: Async Loading And Refresh
+## Phase 6: Async Loading And Refresh
 
 Goal: keep Explorer responsive.
 

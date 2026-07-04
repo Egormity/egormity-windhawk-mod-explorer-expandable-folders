@@ -1,8 +1,9 @@
 # Agent Handoff
 
 This repository contains a Windhawk mod experiment for File Explorer expandable
-folders. The project is currently in scaffold mode: injectable, configurable,
-and safe, but with no Explorer UI hooks yet.
+folders. The project is currently in Explorer-hosted scaffold mode: injectable,
+visibly controllable from Explorer, and intentionally not doing real file-tree
+logic yet.
 
 ## Current Branch
 
@@ -24,17 +25,19 @@ feature is requested from another branch, ask whether to continue or switch.
 
 ## Current Mod State
 
-Version: `0.1.2`
+Version: `0.2.0`
 
 The mod:
 
 - targets `explorer.exe`;
 - declares `@architecture x86-64`;
-- exposes a visible Windhawk settings checkbox named
-  `Enable expandable folders scaffold`;
-- reads that checkbox with `Wh_GetIntSetting(L"enabled")`;
-- logs init, settings changes, and uninit;
-- intentionally performs no Explorer hooks or UI changes.
+- removes the Windhawk settings checkbox;
+- adds an Explorer-hosted checkbox named `Expandable folders`;
+- stores the checkbox state in Windhawk local storage as
+  `explorerViewEnabled`;
+- overlays the file-list pane with a blank child window when checked;
+- restores the native view by hiding the overlay when unchecked;
+- intentionally does not implement real expandable folder logic yet.
 
 ## Local Windhawk Context
 
@@ -66,14 +69,14 @@ Syntax check:
 Temporary x64 DLL build check:
 
 ```powershell
-& 'C:\Program Files\Windhawk\Compiler\bin\clang++.exe' '@C:\Program Files\Windhawk\Compiler\compile_flags.txt' -I 'C:\Program Files\Windhawk\Compiler\include' -DWH_MOD_ID=L'"explorer-expandable-folders"' -DWH_MOD_VERSION=L'"0.1.2"' -shared '.\explorer-expandable-folders.wh.cpp' -x none 'C:\Program Files\Windhawk\Engine\1.7.3\64\windhawk.lib' -o '.\explorer-expandable-folders_0.1.2_test.dll'
+& 'C:\Program Files\Windhawk\Compiler\bin\clang++.exe' '@C:\Program Files\Windhawk\Compiler\compile_flags.txt' -I 'C:\Program Files\Windhawk\Compiler\include' -DWH_MOD_ID=L'"explorer-expandable-folders"' -DWH_MOD_VERSION=L'"0.2.0"' -shared '.\explorer-expandable-folders.wh.cpp' -x none 'C:\Program Files\Windhawk\Engine\1.7.3\64\windhawk.lib' -lgdi32 -o '.\explorer-expandable-folders_0.2.0_test.dll'
 ```
 
 Do not commit generated DLL files.
 
 ## Safety Rules
 
-- Keep Explorer hooks behind the `enabled` setting.
+- Keep Explorer behavior behind the in-window checkbox.
 - Prefer small, reversible probes before touching Explorer internals.
 - Do not create fake native Explorer rows in the existing list view.
 - Do not implement real file operations with raw paths.

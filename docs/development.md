@@ -44,7 +44,7 @@ This builds a temporary local DLL for validation. It does not register or inject
 the mod.
 
 ```powershell
-& 'C:\Program Files\Windhawk\Compiler\bin\clang++.exe' '@C:\Program Files\Windhawk\Compiler\compile_flags.txt' -I 'C:\Program Files\Windhawk\Compiler\include' -DWH_MOD_ID=L'"explorer-expandable-folders"' -DWH_MOD_VERSION=L'"0.1.2"' -shared '.\explorer-expandable-folders.wh.cpp' -x none 'C:\Program Files\Windhawk\Engine\1.7.3\64\windhawk.lib' -o '.\explorer-expandable-folders_0.1.2_test.dll'
+& 'C:\Program Files\Windhawk\Compiler\bin\clang++.exe' '@C:\Program Files\Windhawk\Compiler\compile_flags.txt' -I 'C:\Program Files\Windhawk\Compiler\include' -DWH_MOD_ID=L'"explorer-expandable-folders"' -DWH_MOD_VERSION=L'"0.2.0"' -shared '.\explorer-expandable-folders.wh.cpp' -x none 'C:\Program Files\Windhawk\Engine\1.7.3\64\windhawk.lib' -lgdi32 -o '.\explorer-expandable-folders_0.2.0_test.dll'
 ```
 
 The `-x none` before `windhawk.lib` is important. Windhawk's compile flags force
@@ -54,7 +54,7 @@ source.
 Delete generated DLLs after testing:
 
 ```powershell
-Remove-Item -LiteralPath '.\explorer-expandable-folders_0.1.2_test.dll' -Force
+Remove-Item -LiteralPath '.\explorer-expandable-folders_0.2.0_test.dll' -Force
 ```
 
 ## Tests
@@ -73,7 +73,7 @@ Current verification is:
 The Windhawk metadata version is the source of truth:
 
 ```cpp
-// @version         0.1.2
+// @version         0.2.0
 ```
 
 When changing mod behavior, bump this version and include it in the commit

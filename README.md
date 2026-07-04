@@ -2,13 +2,13 @@
 
 Windhawk mod experiment for adding macOS Finder-style expandable folders to Windows File Explorer.
 
-Current status: initial injectable scaffold only. The mod targets `explorer.exe`, loads through Windhawk, reads a visible settings checkbox, and logs its enabled state. It does not change Explorer UI yet.
+Current status: Explorer-hosted UI scaffold. The mod targets `explorer.exe`, adds an `Expandable folders` checkbox into each visible File Explorer window, and covers the native file-list area with an empty view when the checkbox is enabled.
 
 ## Files
 
 - `explorer-expandable-folders.wh.cpp` - Windhawk mod source.
 - `agent.md` - handoff notes for future agents working on this repo.
-- `docs/usage.md` - how to install, compile, enable, and verify the scaffold.
+- `docs/usage.md` - how to install, compile, enable, and verify the Explorer-hosted scaffold.
 - `docs/development.md` - local build and verification commands.
 - `docs/architecture.md` - intended architecture and implementation rules.
 - `docs/research-notes.md` - Finder and Windows Shell research summary.
@@ -19,11 +19,12 @@ Current status: initial injectable scaffold only. The mod targets `explorer.exe`
 The mod defines:
 
 - Windhawk metadata for `explorer.exe`.
-- A visible settings checkbox named `Enable expandable folders scaffold`.
-- `Wh_ModInit`, `Wh_ModSettingsChanged`, and `Wh_ModUninit` callbacks.
-- Logging of the checkbox state as `enabled=1` or `enabled=0`.
+- An Explorer-hosted checkbox named `Expandable folders`.
+- A blank child window that overlays the file-list area when the checkbox is checked.
+- `Wh_ModInit` and `Wh_ModUninit` callbacks.
+- A manager thread that attaches controls to visible Explorer windows.
 
-Expected Explorer behavior today: no visual changes.
+Expected Explorer behavior today: the checkbox is visible; checking it replaces the file-list pane with an empty dark view. The native view remains underneath and is shown again when unchecked.
 
 ## Quick Verification
 

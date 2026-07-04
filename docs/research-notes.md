@@ -64,16 +64,22 @@ Current source metadata:
 ```cpp
 // @id              explorer-expandable-folders
 // @name            Explorer Expandable Folders
-// @version         0.1.2
+// @version         0.2.0
 // @include         explorer.exe
 // @architecture    x86-64
+// @compilerOptions -lgdi32
 ```
 
-Current setting:
+Current UI control:
 
-```yaml
-- enabled: true
-  $name: Enable expandable folders scaffold
+```text
+Explorer window -> Expandable folders checkbox
+```
+
+Current persisted value:
+
+```text
+explorerViewEnabled
 ```
 
 ## Current Permission Finding
