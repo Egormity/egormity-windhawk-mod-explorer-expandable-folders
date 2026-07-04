@@ -28,7 +28,7 @@ feature is requested from another branch, ask whether to continue or switch.
 
 ## Current Mod State
 
-Version: `0.3.0`
+Version: `0.3.1`
 
 Source of truth:
 
@@ -53,7 +53,7 @@ The mod:
 - targets `explorer.exe`;
 - declares `@architecture x86-64`;
 - removes the Windhawk settings checkbox;
-- adds an Explorer-hosted checkbox named `Expandable folders`;
+- adds a bottom-right Explorer-owned popup checkbox named `Expandable folders`;
 - stores the checkbox state in Windhawk local storage as
   `explorerViewEnabled`;
 - overlays the file-list pane with a blank child window when checked;

@@ -16,7 +16,7 @@ The repository currently contains the first Explorer-hosted UI scaffold:
 - Windhawk metadata;
 - `explorer.exe` target;
 - x64 architecture target;
-- Explorer-hosted `Expandable folders` checkbox;
+- bottom-right Explorer-owned popup checkbox named `Expandable folders`;
 - blank overlay child window over the file-list pane when enabled;
 - local Windhawk value storage for the checkbox state;
 - init/uninit lifecycle logging.
@@ -35,7 +35,7 @@ Current modules:
 - `state.*` - process-wide state.
 - `window_utils.*` - DPI scaling and Explorer frame detection helpers.
 - `empty_view.*` - blank overlay window class and paint procedure.
-- `explorer_window.*` - checkbox, overlay, layout, and synchronization logic.
+- `explorer_window.*` - popup checkbox, overlay, layout, and synchronization logic.
 - `manager.*` - background manager loop.
 - `entrypoint.cpp` - `Wh_ModInit` and `Wh_ModUninit`.
 - `mod.wh.cpp` - unity entry that includes all modules for bundling.

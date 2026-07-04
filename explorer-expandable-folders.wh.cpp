@@ -2,7 +2,7 @@
 // @id              explorer-expandable-folders
 // @name            Explorer Expandable Folders
 // @description     Explorer-hosted scaffold for expandable folders.
-// @version         0.3.0
+// @version         0.3.1
 // @author          Egormity
 // @include         explorer.exe
 // @architecture    x86-64
@@ -23,7 +23,6 @@ namespace eef {
 constexpr PCWSTR kOverlayClassName =
     L"ExplorerExpandableFoldersEmptyView";
 constexpr PCWSTR kEnabledValueName = L"explorerViewEnabled";
-constexpr UINT_PTR kCheckboxId = 1001;
 
 struct ExplorerWindow {
     HWND frame;
@@ -191,23 +190,32 @@ void LayoutWindowState(ExplorerWindow& window)
         return;
     }
 
+    if (!IsWindowVisible(window.frame) || IsIconic(window.frame)) {
+        ShowWindow(window.checkbox, SW_HIDE);
+        ShowWindow(window.emptyView, SW_HIDE);
+        return;
+    }
+
     RECT clientRect;
     if (!GetClientRect(window.frame, &clientRect)) {
         return;
     }
 
-    const int checkboxX = ScaleForWindow(window.frame, 16);
-    const int checkboxY = ScaleForWindow(window.frame, 104);
+    const int checkboxMargin = ScaleForWindow(window.frame, 18);
     const int checkboxWidth = ScaleForWindow(window.frame, 190);
     const int checkboxHeight = ScaleForWindow(window.frame, 28);
+    POINT checkboxPoint = {
+        std::max(checkboxMargin,
+                 static_cast<int>(clientRect.right) - checkboxWidth -
+                     checkboxMargin),
+        std::max(checkboxMargin,
+                 static_cast<int>(clientRect.bottom) - checkboxHeight -
+                     checkboxMargin),
+    };
 
-    SetWindowPos(window.checkbox,
-                 HWND_TOP,
-                 checkboxX,
-                 checkboxY,
-                 checkboxWidth,
-                 checkboxHeight,
-                 SWP_NOACTIVATE);
+    if (!ClientToScreen(window.frame, &checkboxPoint)) {
+        return;
+    }
 
     int overlayLeft = ScaleForWindow(window.frame, 435);
     int overlayTop = ScaleForWindow(window.frame, 160);
@@ -236,11 +244,11 @@ void LayoutWindowState(ExplorerWindow& window)
 
     SetWindowPos(window.checkbox,
                  HWND_TOP,
-                 0,
-                 0,
-                 0,
-                 0,
-                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                 checkboxPoint.x,
+                 checkboxPoint.y,
+                 checkboxWidth,
+                 checkboxHeight,
+                 SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_SHOWWINDOW);
 }
 
 void AddExplorerWindow(HWND frame)
@@ -249,17 +257,17 @@ void AddExplorerWindow(HWND frame)
         return;
     }
 
-    HWND checkbox = CreateWindowExW(WS_EX_NOPARENTNOTIFY,
+    HWND checkbox = CreateWindowExW(WS_EX_TOOLWINDOW,
                                     L"BUTTON",
                                     L"Expandable folders",
-                                    WS_CHILD | WS_VISIBLE | WS_TABSTOP |
+                                    WS_POPUP | WS_CLIPSIBLINGS |
                                         BS_AUTOCHECKBOX,
                                     0,
                                     0,
                                     0,
                                     0,
                                     frame,
-                                    reinterpret_cast<HMENU>(kCheckboxId),
+                                    nullptr,
                                     GetModuleHandleW(nullptr),
                                     nullptr);
     if (!checkbox) {
