@@ -8,9 +8,9 @@ not implement real expandable folders yet.
 When installed and enabled in Windhawk, the mod should:
 
 - inject into `explorer.exe`;
-- show a top-right `Expandable folders` checkbox for each visible File Explorer window;
-- cover the native file-list pane with an empty view when the checkbox is checked;
-- show the native file-list pane again when unchecked;
+- show a dark top-right `Expandable folders` toggle for each visible File Explorer window;
+- cover the native file-list pane with an empty view when the toggle is on;
+- show the native file-list pane again when the toggle is off;
 - unload cleanly.
 
 It should not display real expandable folders yet.
@@ -39,17 +39,17 @@ It should not display real expandable folders yet.
 
 7. Open or restart File Explorer.
 
-8. In File Explorer, use the `Expandable folders` checkbox.
+8. In File Explorer, use the `Expandable folders` toggle.
 
 9. Check Windhawk logs for a message similar to:
 
    ```text
-   Explorer Expandable Folders initialized: explorer checkbox=0
+   Explorer Expandable Folders initialized: explorer toggle=0
    ```
 
-## Checkbox
+## Toggle
 
-The visible checkbox is a top-right Explorer-owned popup:
+The visible toggle is a top-right Explorer-owned popup:
 
 ```text
 Expandable folders
@@ -63,8 +63,8 @@ explorerViewEnabled
 
 Current behavior:
 
-- checked: a blank child window overlays the native file-list pane;
-- unchecked: the overlay is hidden and the native file-list pane is visible;
+- on: a blank child window overlays the native file-list pane;
+- off: the overlay is hidden and the native file-list pane is visible;
 - the same state is synchronized across visible Explorer windows.
 
 ## Direct Install Status

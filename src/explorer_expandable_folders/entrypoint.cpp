@@ -14,7 +14,7 @@ BOOL Wh_ModInit()
         return FALSE;
     }
 
-    Wh_Log(L"Explorer Expandable Folders initialized: explorer checkbox=%d",
+    Wh_Log(L"Explorer Expandable Folders initialized: explorer toggle=%d",
            eef::g_enabled.load());
     return TRUE;
 }

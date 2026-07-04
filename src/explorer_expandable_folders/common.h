@@ -11,6 +11,8 @@ namespace eef {
 
 constexpr PCWSTR kOverlayClassName =
     L"ExplorerExpandableFoldersEmptyView";
+constexpr PCWSTR kToggleClassName =
+    L"ExplorerExpandableFoldersToggle";
 constexpr PCWSTR kEnabledValueName = L"explorerViewEnabled";
 
 struct ExplorerWindow {

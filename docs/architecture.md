@@ -16,9 +16,9 @@ The repository currently contains the first Explorer-hosted UI scaffold:
 - Windhawk metadata;
 - `explorer.exe` target;
 - x64 architecture target;
-- top-right Explorer-owned popup checkbox named `Expandable folders`;
+- dark top-right Explorer-owned popup toggle named `Expandable folders`;
 - blank overlay child window over the file-list pane when enabled;
-- local Windhawk value storage for the checkbox state;
+- local Windhawk value storage for the toggle state;
 - init/uninit lifecycle logging.
 
 No real Explorer file-tree logic exists yet.
@@ -35,7 +35,8 @@ Current modules:
 - `state.*` - process-wide state.
 - `window_utils.*` - DPI scaling and Explorer frame detection helpers.
 - `empty_view.*` - blank overlay window class and paint procedure.
-- `explorer_window.*` - popup checkbox, overlay, layout, and synchronization logic.
+- `toggle_control.*` - dark custom-painted toggle control.
+- `explorer_window.*` - popup toggle, overlay, layout, and synchronization logic.
 - `manager.*` - background manager loop.
 - `entrypoint.cpp` - `Wh_ModInit` and `Wh_ModUninit`.
 - `mod.wh.cpp` - unity entry that includes all modules for bundling.
@@ -105,7 +106,7 @@ Because the mod runs inside `explorer.exe`, failures are user-visible.
 
 Required safety features for future work:
 
-- global kill switch through the existing Explorer-hosted checkbox;
+- global kill switch through the existing Explorer-hosted toggle;
 - strict fallback to native Explorer view;
 - small hooks and guarded probes;
 - no blocking work on Explorer's UI thread;

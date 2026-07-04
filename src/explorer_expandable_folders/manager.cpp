@@ -2,12 +2,14 @@
 #include "explorer_window.h"
 #include "manager.h"
 #include "state.h"
+#include "toggle_control.h"
 
 namespace eef {
 
 DWORD WINAPI ManagerThreadProc(void*)
 {
     RegisterEmptyViewClass();
+    RegisterToggleControlClass();
 
     while (g_running.load()) {
         MSG message;
@@ -32,6 +34,7 @@ DWORD WINAPI ManagerThreadProc(void*)
     }
 
     g_windows.clear();
+    UnregisterClassW(kToggleClassName, GetModuleHandleW(nullptr));
     UnregisterClassW(kOverlayClassName, GetModuleHandleW(nullptr));
     return 0;
 }

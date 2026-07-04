@@ -28,7 +28,7 @@ feature is requested from another branch, ask whether to continue or switch.
 
 ## Current Mod State
 
-Version: `0.3.2`
+Version: `0.3.3`
 
 Source of truth:
 
@@ -53,8 +53,8 @@ The mod:
 - targets `explorer.exe`;
 - declares `@architecture x86-64`;
 - removes the Windhawk settings checkbox;
-- adds a top-right Explorer-owned popup checkbox named `Expandable folders`;
-- stores the checkbox state in Windhawk local storage as
+- adds a dark top-right Explorer-owned popup toggle named `Expandable folders`;
+- stores the toggle state in Windhawk local storage as
   `explorerViewEnabled`;
 - overlays the file-list pane with a blank child window when checked;
 - restores the native view by hiding the overlay when unchecked;
@@ -100,7 +100,7 @@ Windhawk users can copy one file without running tools.
 
 ## Safety Rules
 
-- Keep Explorer behavior behind the in-window checkbox.
+- Keep Explorer behavior behind the in-window toggle.
 - Prefer small, reversible probes before touching Explorer internals.
 - Do not create fake native Explorer rows in the existing list view.
 - Do not implement real file operations with raw paths.

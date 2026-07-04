@@ -1,6 +1,7 @@
 #include "empty_view.h"
 #include "explorer_window.h"
 #include "state.h"
+#include "toggle_control.h"
 #include "window_utils.h"
 
 namespace eef {
@@ -34,8 +35,8 @@ void LayoutWindowState(ExplorerWindow& window)
     }
 
     const int checkboxMargin = ScaleForWindow(window.frame, 18);
-    const int checkboxWidth = ScaleForWindow(window.frame, 190);
-    const int checkboxHeight = ScaleForWindow(window.frame, 28);
+    const int checkboxWidth = ScaleForWindow(window.frame, 214);
+    const int checkboxHeight = ScaleForWindow(window.frame, 34);
     const int checkboxTop = ScaleForWindow(window.frame, 176);
     POINT checkboxPoint = {
         std::max(checkboxMargin,
@@ -91,11 +92,10 @@ void AddExplorerWindow(HWND frame)
         return;
     }
 
-    HWND checkbox = CreateWindowExW(WS_EX_TOOLWINDOW,
-                                    L"BUTTON",
+    HWND checkbox = CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
+                                    kToggleClassName,
                                     L"Expandable folders",
-                                    WS_POPUP | WS_CLIPSIBLINGS |
-                                        BS_AUTOCHECKBOX,
+                                    WS_POPUP | WS_CLIPSIBLINGS,
                                     0,
                                     0,
                                     0,
@@ -105,18 +105,9 @@ void AddExplorerWindow(HWND frame)
                                     GetModuleHandleW(nullptr),
                                     nullptr);
     if (!checkbox) {
-        Wh_Log(L"Failed to create Explorer checkbox for window %p", frame);
+        Wh_Log(L"Failed to create Explorer toggle for window %p", frame);
         return;
     }
-
-    SendMessageW(checkbox,
-                 WM_SETFONT,
-                 reinterpret_cast<WPARAM>(GetStockObject(DEFAULT_GUI_FONT)),
-                 TRUE);
-    SendMessageW(checkbox,
-                 BM_SETCHECK,
-                 g_enabled.load() ? BST_CHECKED : BST_UNCHECKED,
-                 0);
 
     HWND emptyView = CreateWindowExW(WS_EX_NOPARENTNOTIFY,
                                      kOverlayClassName,
@@ -173,32 +164,18 @@ void RemoveClosedWindows()
 
 void SyncCheckboxState()
 {
+    const bool enabled = g_enabled.load();
     for (ExplorerWindow& window : g_windows) {
         if (!IsWindow(window.checkbox)) {
             continue;
         }
 
-        const bool checked =
-            SendMessageW(window.checkbox, BM_GETCHECK, 0, 0) == BST_CHECKED;
-        if (checked == window.lastChecked) {
+        if (enabled == window.lastChecked) {
             continue;
         }
 
-        window.lastChecked = checked;
-        g_enabled.store(checked);
-        Wh_SetIntValue(kEnabledValueName, checked ? 1 : 0);
-
-        Wh_Log(L"Explorer checkbox changed: enabled=%d", checked);
-
-        for (ExplorerWindow& syncedWindow : g_windows) {
-            if (IsWindow(syncedWindow.checkbox)) {
-                SendMessageW(syncedWindow.checkbox,
-                             BM_SETCHECK,
-                             checked ? BST_CHECKED : BST_UNCHECKED,
-                             0);
-                syncedWindow.lastChecked = checked;
-            }
-        }
+        window.lastChecked = enabled;
+        InvalidateRect(window.checkbox, nullptr, FALSE);
     }
 }
 

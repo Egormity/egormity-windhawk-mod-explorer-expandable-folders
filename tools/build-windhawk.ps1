@@ -22,11 +22,11 @@ if ($Dll) {
         New-Item -ItemType Directory -Path $buildDir | Out-Null
     }
 
-    $outputDll = Join-Path $buildDir "explorer-expandable-folders_0.3.2_test.dll"
+    $outputDll = Join-Path $buildDir "explorer-expandable-folders_0.3.3_test.dll"
     & $compiler "@$compileFlags" `
         -I $includePath `
         -DWH_MOD_ID=L'"explorer-expandable-folders"' `
-        -DWH_MOD_VERSION=L'"0.3.2"' `
+        -DWH_MOD_VERSION=L'"0.3.3"' `
         -shared $sourcePath `
         -x none $windhawkLib `
         -lgdi32 `
