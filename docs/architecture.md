@@ -23,6 +23,26 @@ The repository currently contains the first Explorer-hosted UI scaffold:
 
 No real Explorer file-tree logic exists yet.
 
+## Source Organization
+
+The repository is organized as modular C++ source plus a generated Windhawk
+single-file artifact.
+
+Current modules:
+
+- `windhawk_metadata.h` - Windhawk metadata block.
+- `common.h` - common includes, constants, and shared structs.
+- `state.*` - process-wide state.
+- `window_utils.*` - DPI scaling and Explorer frame detection helpers.
+- `empty_view.*` - blank overlay window class and paint procedure.
+- `explorer_window.*` - checkbox, overlay, layout, and synchronization logic.
+- `manager.*` - background manager loop.
+- `entrypoint.cpp` - `Wh_ModInit` and `Wh_ModUninit`.
+- `mod.wh.cpp` - unity entry that includes all modules for bundling.
+
+`tools/bundle-windhawk.ps1` expands local includes into
+`explorer-expandable-folders.wh.cpp`.
+
 ## Rejected Approach
 
 Do not try to patch Explorer's native file list by injecting fake child rows.

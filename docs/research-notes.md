@@ -64,7 +64,7 @@ Current source metadata:
 ```cpp
 // @id              explorer-expandable-folders
 // @name            Explorer Expandable Folders
-// @version         0.2.0
+// @version         0.3.0
 // @include         explorer.exe
 // @architecture    x86-64
 // @compilerOptions -lgdi32

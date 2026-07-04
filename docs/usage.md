@@ -25,17 +25,23 @@ It should not display real expandable folders yet.
 
 2. Create a new local mod or edit the local scaffold mod.
 
-3. Paste the contents of `explorer-expandable-folders.wh.cpp`.
+3. Run the bundler if the modular source changed:
 
-4. Compile the mod.
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\tools\bundle-windhawk.ps1
+   ```
 
-5. Enable the mod.
+4. Paste the contents of `explorer-expandable-folders.wh.cpp`.
 
-6. Open or restart File Explorer.
+5. Compile the mod.
 
-7. In File Explorer, use the `Expandable folders` checkbox.
+6. Enable the mod.
 
-8. Check Windhawk logs for a message similar to:
+7. Open or restart File Explorer.
+
+8. In File Explorer, use the `Expandable folders` checkbox.
+
+9. Check Windhawk logs for a message similar to:
 
    ```text
    Explorer Expandable Folders initialized: explorer checkbox=0

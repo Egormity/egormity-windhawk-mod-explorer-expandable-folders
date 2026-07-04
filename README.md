@@ -6,7 +6,10 @@ Current status: Explorer-hosted UI scaffold. The mod targets `explorer.exe`, add
 
 ## Files
 
-- `explorer-expandable-folders.wh.cpp` - Windhawk mod source.
+- `src/explorer_expandable_folders/` - modular source of truth.
+- `explorer-expandable-folders.wh.cpp` - generated single-file Windhawk artifact.
+- `tools/bundle-windhawk.ps1` - joins the modular source into the Windhawk artifact.
+- `tools/build-windhawk.ps1` - bundles and verifies the generated artifact.
 - `agent.md` - handoff notes for future agents working on this repo.
 - `docs/usage.md` - how to install, compile, enable, and verify the Explorer-hosted scaffold.
 - `docs/development.md` - local build and verification commands.
@@ -28,13 +31,30 @@ Expected Explorer behavior today: the checkbox is visible; checking it replaces 
 
 ## Quick Verification
 
+Bundle the Windhawk artifact from modular source:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\bundle-windhawk.ps1
+```
+
 Run Windhawk's bundled compiler syntax check:
 
 ```powershell
-& 'C:\Program Files\Windhawk\Compiler\bin\clang++.exe' '@C:\Program Files\Windhawk\Compiler\compile_flags.txt' -I 'C:\Program Files\Windhawk\Compiler\include' -fsyntax-only '.\explorer-expandable-folders.wh.cpp'
+powershell -ExecutionPolicy Bypass -File .\tools\build-windhawk.ps1
 ```
 
-A successful run prints no output and exits with code `0`.
+A successful run prints `Windhawk source verified` and exits with code `0`.
+
+## Source Structure
+
+The repo uses a unity-bundled source layout:
+
+- edit files under `src/explorer_expandable_folders/`;
+- run `tools/build-windhawk.ps1`;
+- paste or compile the generated `explorer-expandable-folders.wh.cpp` in Windhawk.
+
+Do not edit the generated root `.wh.cpp` directly unless you also port the
+change back into `src/`.
 
 ## Notes
 

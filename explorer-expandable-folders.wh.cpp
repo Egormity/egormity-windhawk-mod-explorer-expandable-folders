@@ -2,12 +2,14 @@
 // @id              explorer-expandable-folders
 // @name            Explorer Expandable Folders
 // @description     Explorer-hosted scaffold for expandable folders.
-// @version         0.2.0
+// @version         0.3.0
 // @author          Egormity
 // @include         explorer.exe
 // @architecture    x86-64
 // @compilerOptions -lgdi32
 // ==/WindhawkMod==
+
+
 
 #include <windows.h>
 #include <windhawk_api.h>
@@ -16,7 +18,7 @@
 #include <atomic>
 #include <vector>
 
-namespace {
+namespace eef {
 
 constexpr PCWSTR kOverlayClassName =
     L"ExplorerExpandableFoldersEmptyView";
@@ -30,10 +32,41 @@ struct ExplorerWindow {
     bool lastChecked;
 };
 
+}  // namespace eef
+
+
+
+namespace eef {
+
+extern std::atomic_bool g_running;
+extern std::atomic_bool g_enabled;
+extern HANDLE g_managerThread;
+extern std::vector<ExplorerWindow> g_windows;
+
+}  // namespace eef
+
+
+namespace eef {
+
 std::atomic_bool g_running = false;
 std::atomic_bool g_enabled = false;
 HANDLE g_managerThread = nullptr;
 std::vector<ExplorerWindow> g_windows;
+
+}  // namespace eef
+
+
+
+namespace eef {
+
+int ScaleForWindow(HWND window, int value);
+bool IsExplorerFrame(HWND window);
+ExplorerWindow* FindWindowState(HWND frame);
+
+}  // namespace eef
+
+
+namespace eef {
 
 int ScaleForWindow(HWND window, int value)
 {
@@ -62,6 +95,23 @@ ExplorerWindow* FindWindowState(HWND frame)
 
     return it == g_windows.end() ? nullptr : &*it;
 }
+
+}  // namespace eef
+
+
+
+namespace eef {
+
+LRESULT CALLBACK EmptyViewWndProc(HWND window,
+                                  UINT message,
+                                  WPARAM wParam,
+                                  LPARAM lParam);
+void RegisterEmptyViewClass();
+
+}  // namespace eef
+
+
+namespace eef {
 
 LRESULT CALLBACK EmptyViewWndProc(HWND window,
                                   UINT message,
@@ -105,6 +155,24 @@ void RegisterEmptyViewClass()
 
     RegisterClassExW(&windowClass);
 }
+
+}  // namespace eef
+
+
+
+namespace eef {
+
+void DestroyWindowState(ExplorerWindow& window);
+void LayoutWindowState(ExplorerWindow& window);
+void AddExplorerWindow(HWND frame);
+void RemoveClosedWindows();
+void SyncCheckboxState();
+BOOL CALLBACK EnumExplorerWindowsProc(HWND window, LPARAM);
+
+}  // namespace eef
+
+
+namespace eef {
 
 void DestroyWindowState(ExplorerWindow& window)
 {
@@ -292,6 +360,19 @@ void SyncCheckboxState()
     }
 }
 
+}  // namespace eef
+
+
+
+namespace eef {
+
+DWORD WINAPI ManagerThreadProc(void*);
+
+}  // namespace eef
+
+
+namespace eef {
+
 DWORD WINAPI ManagerThreadProc(void*)
 {
     RegisterEmptyViewClass();
@@ -323,34 +404,35 @@ DWORD WINAPI ManagerThreadProc(void*)
     return 0;
 }
 
-}  // namespace
+}  // namespace eef
+
 
 BOOL Wh_ModInit()
 {
-    g_enabled.store(Wh_GetIntValue(kEnabledValueName, 0) != 0);
-    g_running.store(true);
+    eef::g_enabled.store(Wh_GetIntValue(eef::kEnabledValueName, 0) != 0);
+    eef::g_running.store(true);
 
-    g_managerThread =
-        CreateThread(nullptr, 0, ManagerThreadProc, nullptr, 0, nullptr);
-    if (!g_managerThread) {
-        g_running.store(false);
+    eef::g_managerThread =
+        CreateThread(nullptr, 0, eef::ManagerThreadProc, nullptr, 0, nullptr);
+    if (!eef::g_managerThread) {
+        eef::g_running.store(false);
         Wh_Log(L"Failed to start Explorer scaffold manager thread");
         return FALSE;
     }
 
     Wh_Log(L"Explorer Expandable Folders initialized: explorer checkbox=%d",
-           g_enabled.load());
+           eef::g_enabled.load());
     return TRUE;
 }
 
 void Wh_ModUninit()
 {
-    g_running.store(false);
+    eef::g_running.store(false);
 
-    if (g_managerThread) {
-        WaitForSingleObject(g_managerThread, 3000);
-        CloseHandle(g_managerThread);
-        g_managerThread = nullptr;
+    if (eef::g_managerThread) {
+        WaitForSingleObject(eef::g_managerThread, 3000);
+        CloseHandle(eef::g_managerThread);
+        eef::g_managerThread = nullptr;
     }
 
     Wh_Log(L"Explorer Expandable Folders uninitialized");

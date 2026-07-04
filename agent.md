@@ -18,14 +18,35 @@ feature is requested from another branch, ask whether to continue or switch.
 
 ## Project Files
 
-- `explorer-expandable-folders.wh.cpp` is the only source file.
+- `src/explorer_expandable_folders/` is the modular source tree.
+- `explorer-expandable-folders.wh.cpp` is generated for Windhawk paste/compile.
+- `tools/bundle-windhawk.ps1` expands local includes into the generated file.
+- `tools/build-windhawk.ps1` bundles and runs Windhawk's compiler check.
 - `README.md` is the project entry point.
 - `docs/` contains detailed usage, development, architecture, research, and
   roadmap notes.
 
 ## Current Mod State
 
-Version: `0.2.0`
+Version: `0.3.0`
+
+Source of truth:
+
+```text
+src/explorer_expandable_folders/
+```
+
+Generated Windhawk artifact:
+
+```text
+explorer-expandable-folders.wh.cpp
+```
+
+Always edit `src/`, then run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\build-windhawk.ps1
+```
 
 The mod:
 
@@ -63,16 +84,19 @@ Direct writes to `C:\ProgramData\Windhawk` and
 Syntax check:
 
 ```powershell
-& 'C:\Program Files\Windhawk\Compiler\bin\clang++.exe' '@C:\Program Files\Windhawk\Compiler\compile_flags.txt' -I 'C:\Program Files\Windhawk\Compiler\include' -fsyntax-only '.\explorer-expandable-folders.wh.cpp'
+powershell -ExecutionPolicy Bypass -File .\tools\build-windhawk.ps1
 ```
 
 Temporary x64 DLL build check:
 
 ```powershell
-& 'C:\Program Files\Windhawk\Compiler\bin\clang++.exe' '@C:\Program Files\Windhawk\Compiler\compile_flags.txt' -I 'C:\Program Files\Windhawk\Compiler\include' -DWH_MOD_ID=L'"explorer-expandable-folders"' -DWH_MOD_VERSION=L'"0.2.0"' -shared '.\explorer-expandable-folders.wh.cpp' -x none 'C:\Program Files\Windhawk\Engine\1.7.3\64\windhawk.lib' -lgdi32 -o '.\explorer-expandable-folders_0.2.0_test.dll'
+powershell -ExecutionPolicy Bypass -File .\tools\build-windhawk.ps1 -Dll
 ```
 
-Do not commit generated DLL files.
+Do not commit generated DLL files. They are written under ignored `build/`.
+
+Do commit the generated `explorer-expandable-folders.wh.cpp` after bundling so
+Windhawk users can copy one file without running tools.
 
 ## Safety Rules
 
