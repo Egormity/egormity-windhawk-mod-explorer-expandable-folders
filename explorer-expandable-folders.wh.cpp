@@ -2,7 +2,7 @@
 // @id              explorer-expandable-folders
 // @name            Explorer Expandable Folders
 // @description     Initial Explorer-injectable scaffold for expandable folders.
-// @version         0.1.1
+// @version         0.1.2
 // @author          Egormity
 // @include         explorer.exe
 // @architecture    x86-64
