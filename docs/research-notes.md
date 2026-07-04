@@ -64,7 +64,7 @@ Current source metadata:
 ```cpp
 // @id              explorer-expandable-folders
 // @name            Explorer Expandable Folders
-// @version         0.3.1
+// @version         0.3.2
 // @include         explorer.exe
 // @architecture    x86-64
 // @compilerOptions -lgdi32
@@ -73,7 +73,7 @@ Current source metadata:
 Current UI control:
 
 ```text
-Explorer window -> bottom-right Expandable folders popup checkbox
+Explorer window -> top-right Expandable folders popup checkbox
 ```
 
 Current persisted value:

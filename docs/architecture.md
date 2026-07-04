@@ -16,7 +16,7 @@ The repository currently contains the first Explorer-hosted UI scaffold:
 - Windhawk metadata;
 - `explorer.exe` target;
 - x64 architecture target;
-- bottom-right Explorer-owned popup checkbox named `Expandable folders`;
+- top-right Explorer-owned popup checkbox named `Expandable folders`;
 - blank overlay child window over the file-list pane when enabled;
 - local Windhawk value storage for the checkbox state;
 - init/uninit lifecycle logging.

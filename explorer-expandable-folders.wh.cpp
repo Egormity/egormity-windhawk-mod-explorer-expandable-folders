@@ -2,7 +2,7 @@
 // @id              explorer-expandable-folders
 // @name            Explorer Expandable Folders
 // @description     Explorer-hosted scaffold for expandable folders.
-// @version         0.3.1
+// @version         0.3.2
 // @author          Egormity
 // @include         explorer.exe
 // @architecture    x86-64
@@ -204,13 +204,15 @@ void LayoutWindowState(ExplorerWindow& window)
     const int checkboxMargin = ScaleForWindow(window.frame, 18);
     const int checkboxWidth = ScaleForWindow(window.frame, 190);
     const int checkboxHeight = ScaleForWindow(window.frame, 28);
+    const int checkboxTop = ScaleForWindow(window.frame, 176);
     POINT checkboxPoint = {
         std::max(checkboxMargin,
                  static_cast<int>(clientRect.right) - checkboxWidth -
                      checkboxMargin),
-        std::max(checkboxMargin,
-                 static_cast<int>(clientRect.bottom) - checkboxHeight -
-                     checkboxMargin),
+        std::min(std::max(checkboxMargin, checkboxTop),
+                 std::max(checkboxMargin,
+                          static_cast<int>(clientRect.bottom) -
+                              checkboxHeight - checkboxMargin)),
     };
 
     if (!ClientToScreen(window.frame, &checkboxPoint)) {

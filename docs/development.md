@@ -79,7 +79,7 @@ source.
 Delete generated DLLs after testing:
 
 ```powershell
-Remove-Item -LiteralPath '.\build\explorer-expandable-folders_0.3.1_test.dll' -Force
+Remove-Item -LiteralPath '.\build\explorer-expandable-folders_0.3.2_test.dll' -Force
 ```
 
 ## Tests
@@ -98,7 +98,7 @@ Current verification is:
 The Windhawk metadata version is the source of truth:
 
 ```cpp
-// @version         0.3.1
+// @version         0.3.2
 ```
 
 When changing mod behavior, bump this version and include it in the commit
