@@ -1,0 +1,9 @@
+#include "windhawk_metadata.h"
+
+#include "common.h"
+#include "state.cpp"
+#include "window_utils.cpp"
+#include "empty_view.cpp"
+#include "explorer_window.cpp"
+#include "manager.cpp"
+#include "entrypoint.cpp"
