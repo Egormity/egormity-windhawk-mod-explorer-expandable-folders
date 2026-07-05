@@ -2,7 +2,7 @@
 
 Windhawk mod experiment for adding macOS Finder-style expandable folders to Windows File Explorer.
 
-Current status: Explorer-hosted UI scaffold. The mod targets `explorer.exe`, adds a dark top-right `Expandable folders` toggle for each visible File Explorer window, and covers the native file-list area with an empty view when the toggle is enabled.
+Current status: Explorer-hosted UI scaffold. The mod targets `explorer.exe`, adds a dark top-right `Expandable folders` toggle for each visible File Explorer window, and hides the native file-list view when the toggle is enabled.
 
 ## Files
 
@@ -23,11 +23,11 @@ The mod defines:
 
 - Windhawk metadata for `explorer.exe`.
 - A dark top-right Explorer-owned toggle named `Expandable folders`.
-- A blank child window that overlays the file-list area when the toggle is on.
+- Native file-list view hiding when the toggle is on.
 - `Wh_ModInit` and `Wh_ModUninit` callbacks.
 - A manager thread that attaches controls to visible Explorer windows.
 
-Expected Explorer behavior today: the toggle is visible; turning it on replaces the file-list pane with an empty dark view. The native view remains underneath and is shown again when turned off.
+Expected Explorer behavior today: the toggle is visible; turning it on hides the native file-list view. The native view is shown again when turned off.
 
 ## Quick Verification
 

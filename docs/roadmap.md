@@ -18,8 +18,8 @@ Status: initial version done.
 - Detect visible `CabinetWClass` Explorer windows.
 - Add an `Expandable folders` checkbox to each Explorer window.
 - Store checkbox state in Windhawk local storage.
-- Create and resize a blank child `HWND` over the native file-list pane.
-- Hide the overlay when unchecked.
+- Hide the native file-list view while the scaffold is enabled.
+- Restore the native file-list view when unchecked.
 - Remove controls cleanly on unload.
 
 Remaining hardening:

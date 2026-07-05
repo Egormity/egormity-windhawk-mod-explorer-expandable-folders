@@ -1,5 +1,5 @@
-#include "empty_view.h"
 #include "explorer_window.h"
+#include "native_view.h"
 #include "state.h"
 #include "toggle_control.h"
 #include "window_utils.h"
@@ -12,8 +12,35 @@ void DestroyWindowState(ExplorerWindow& window)
         DestroyWindow(window.checkbox);
     }
 
-    if (IsWindow(window.emptyView)) {
-        DestroyWindow(window.emptyView);
+    if (window.nativeViewHidden && IsWindow(window.nativeView)) {
+        ShowWindow(window.nativeView, SW_SHOW);
+        window.nativeViewHidden = false;
+        window.nativeView = nullptr;
+    }
+}
+
+void SyncNativeViewVisibility(ExplorerWindow& window)
+{
+    if (!IsWindow(window.nativeView)) {
+        window.nativeView = FindNativeExplorerView(window.frame,
+                                                  window.checkbox);
+        window.nativeViewHidden = false;
+    }
+
+    if (!IsWindow(window.nativeView)) {
+        return;
+    }
+
+    const bool enabled = g_enabled.load();
+    if (enabled && !window.nativeViewHidden) {
+        ShowWindow(window.nativeView, SW_HIDE);
+        window.nativeViewHidden = true;
+        return;
+    }
+
+    if (!enabled && window.nativeViewHidden) {
+        ShowWindow(window.nativeView, SW_SHOW);
+        window.nativeViewHidden = false;
     }
 }
 
@@ -25,7 +52,7 @@ void LayoutWindowState(ExplorerWindow& window)
 
     if (!IsWindowVisible(window.frame) || IsIconic(window.frame)) {
         ShowWindow(window.checkbox, SW_HIDE);
-        ShowWindow(window.emptyView, SW_HIDE);
+        SyncNativeViewVisibility(window);
         return;
     }
 
@@ -52,30 +79,7 @@ void LayoutWindowState(ExplorerWindow& window)
         return;
     }
 
-    int overlayLeft = ScaleForWindow(window.frame, 435);
-    int overlayTop = ScaleForWindow(window.frame, 160);
-
-    if (overlayLeft > clientRect.right - ScaleForWindow(window.frame, 120)) {
-        overlayLeft = clientRect.right / 3;
-    }
-
-    if (overlayTop > clientRect.bottom - ScaleForWindow(window.frame, 120)) {
-        overlayTop = clientRect.bottom / 3;
-    }
-
-    overlayLeft = std::max(0, overlayLeft);
-    overlayTop = std::max(0, overlayTop);
-
-    const int overlayWidth = static_cast<int>(clientRect.right) - overlayLeft;
-    const int overlayHeight = static_cast<int>(clientRect.bottom) - overlayTop;
-    const bool enabled = g_enabled.load();
-    SetWindowPos(window.emptyView,
-                 HWND_TOP,
-                 overlayLeft,
-                 overlayTop,
-                 std::max(0, overlayWidth),
-                 std::max(0, overlayHeight),
-                 SWP_NOACTIVATE | (enabled ? SWP_SHOWWINDOW : SWP_HIDEWINDOW));
+    SyncNativeViewVisibility(window);
 
     SetWindowPos(window.checkbox,
                  HWND_TOP,
@@ -109,29 +113,12 @@ void AddExplorerWindow(HWND frame)
         return;
     }
 
-    HWND emptyView = CreateWindowExW(WS_EX_NOPARENTNOTIFY,
-                                     kOverlayClassName,
-                                     L"",
-                                     WS_CHILD | WS_CLIPSIBLINGS,
-                                     0,
-                                     0,
-                                     0,
-                                     0,
-                                     frame,
-                                     nullptr,
-                                     GetModuleHandleW(nullptr),
-                                     nullptr);
-    if (!emptyView) {
-        DestroyWindow(checkbox);
-        Wh_Log(L"Failed to create empty Explorer view for window %p", frame);
-        return;
-    }
-
     g_windows.push_back({
         frame,
         checkbox,
-        emptyView,
+        nullptr,
         g_enabled.load(),
+        false,
     });
 
     LayoutWindowState(g_windows.back());

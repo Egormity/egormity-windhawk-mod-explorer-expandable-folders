@@ -9,8 +9,6 @@
 
 namespace eef {
 
-constexpr PCWSTR kOverlayClassName =
-    L"ExplorerExpandableFoldersEmptyView";
 constexpr PCWSTR kToggleClassName =
     L"ExplorerExpandableFoldersToggle";
 constexpr PCWSTR kEnabledValueName = L"explorerViewEnabled";
@@ -18,8 +16,9 @@ constexpr PCWSTR kEnabledValueName = L"explorerViewEnabled";
 struct ExplorerWindow {
     HWND frame;
     HWND checkbox;
-    HWND emptyView;
+    HWND nativeView;
     bool lastChecked;
+    bool nativeViewHidden;
 };
 
 }  // namespace eef

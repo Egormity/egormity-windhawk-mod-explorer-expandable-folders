@@ -9,7 +9,7 @@ When installed and enabled in Windhawk, the mod should:
 
 - inject into `explorer.exe`;
 - show a dark top-right `Expandable folders` toggle for each visible File Explorer window;
-- cover the native file-list pane with an empty view when the toggle is on;
+- hide the native file-list view when the toggle is on;
 - show the native file-list pane again when the toggle is off;
 - unload cleanly.
 
@@ -63,8 +63,8 @@ explorerViewEnabled
 
 Current behavior:
 
-- on: a blank child window overlays the native file-list pane;
-- off: the overlay is hidden and the native file-list pane is visible;
+- on: the native file-list view is hidden;
+- off: the native file-list view is visible;
 - the same state is synchronized across visible Explorer windows.
 
 ## Direct Install Status

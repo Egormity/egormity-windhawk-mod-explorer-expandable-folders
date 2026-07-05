@@ -28,7 +28,7 @@ feature is requested from another branch, ask whether to continue or switch.
 
 ## Current Mod State
 
-Version: `0.3.3`
+Version: `0.3.4`
 
 Source of truth:
 
@@ -56,8 +56,8 @@ The mod:
 - adds a dark top-right Explorer-owned popup toggle named `Expandable folders`;
 - stores the toggle state in Windhawk local storage as
   `explorerViewEnabled`;
-- overlays the file-list pane with a blank child window when checked;
-- restores the native view by hiding the overlay when unchecked;
+- hides the native file-list view when enabled;
+- restores the native file-list view when disabled;
 - intentionally does not implement real expandable folder logic yet.
 
 ## Local Windhawk Context

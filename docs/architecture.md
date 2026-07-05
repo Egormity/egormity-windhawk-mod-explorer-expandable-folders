@@ -17,7 +17,7 @@ The repository currently contains the first Explorer-hosted UI scaffold:
 - `explorer.exe` target;
 - x64 architecture target;
 - dark top-right Explorer-owned popup toggle named `Expandable folders`;
-- blank overlay child window over the file-list pane when enabled;
+- native file-list view hiding when enabled;
 - local Windhawk value storage for the toggle state;
 - init/uninit lifecycle logging.
 
@@ -34,9 +34,9 @@ Current modules:
 - `common.h` - common includes, constants, and shared structs.
 - `state.*` - process-wide state.
 - `window_utils.*` - DPI scaling and Explorer frame detection helpers.
-- `empty_view.*` - blank overlay window class and paint procedure.
+- `native_view.*` - native Explorer file-view discovery and visibility control.
 - `toggle_control.*` - dark custom-painted toggle control.
-- `explorer_window.*` - popup toggle, overlay, layout, and synchronization logic.
+- `explorer_window.*` - popup toggle, native view visibility, layout, and synchronization logic.
 - `manager.*` - background manager loop.
 - `entrypoint.cpp` - `Wh_ModInit` and `Wh_ModUninit`.
 - `mod.wh.cpp` - unity entry that includes all modules for bundling.

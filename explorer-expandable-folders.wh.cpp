@@ -2,7 +2,7 @@
 // @id              explorer-expandable-folders
 // @name            Explorer Expandable Folders
 // @description     Explorer-hosted scaffold for expandable folders.
-// @version         0.3.3
+// @version         0.3.4
 // @author          Egormity
 // @include         explorer.exe
 // @architecture    x86-64
@@ -20,8 +20,6 @@
 
 namespace eef {
 
-constexpr PCWSTR kOverlayClassName =
-    L"ExplorerExpandableFoldersEmptyView";
 constexpr PCWSTR kToggleClassName =
     L"ExplorerExpandableFoldersToggle";
 constexpr PCWSTR kEnabledValueName = L"explorerViewEnabled";
@@ -29,8 +27,9 @@ constexpr PCWSTR kEnabledValueName = L"explorerViewEnabled";
 struct ExplorerWindow {
     HWND frame;
     HWND checkbox;
-    HWND emptyView;
+    HWND nativeView;
     bool lastChecked;
+    bool nativeViewHidden;
 };
 
 }  // namespace eef
@@ -103,58 +102,110 @@ ExplorerWindow* FindWindowState(HWND frame)
 
 namespace eef {
 
-LRESULT CALLBACK EmptyViewWndProc(HWND window,
-                                  UINT message,
-                                  WPARAM wParam,
-                                  LPARAM lParam);
-void RegisterEmptyViewClass();
+HWND FindNativeExplorerView(HWND frame, HWND toggle);
 
 }  // namespace eef
 
 
 namespace eef {
 
-LRESULT CALLBACK EmptyViewWndProc(HWND window,
-                                  UINT message,
-                                  WPARAM wParam,
-                                  LPARAM lParam)
+struct NativeViewSearch {
+    HWND frame;
+    HWND toggle;
+    HWND bestWindow;
+    int bestScore;
+};
+
+bool GetClassNameEquals(HWND window, PCWSTR className)
 {
-    switch (message) {
-        case WM_ERASEBKGND: {
-            RECT rect;
-            GetClientRect(window, &rect);
-            HBRUSH brush = CreateSolidBrush(RGB(16, 16, 16));
-            FillRect(reinterpret_cast<HDC>(wParam), &rect, brush);
-            DeleteObject(brush);
-            return 1;
-        }
-
-        case WM_PAINT: {
-            PAINTSTRUCT paint;
-            HDC dc = BeginPaint(window, &paint);
-            RECT rect;
-            GetClientRect(window, &rect);
-            HBRUSH brush = CreateSolidBrush(RGB(16, 16, 16));
-            FillRect(dc, &rect, brush);
-            DeleteObject(brush);
-            EndPaint(window, &paint);
-            return 0;
-        }
-    }
-
-    return DefWindowProcW(window, message, wParam, lParam);
+    wchar_t actualClassName[128] = {};
+    GetClassNameW(window, actualClassName,
+                  static_cast<int>(ARRAYSIZE(actualClassName)));
+    return lstrcmpW(actualClassName, className) == 0;
 }
 
-void RegisterEmptyViewClass()
+int GetNativeViewClassScore(HWND window)
 {
-    WNDCLASSEXW windowClass = {};
-    windowClass.cbSize = sizeof(windowClass);
-    windowClass.lpfnWndProc = EmptyViewWndProc;
-    windowClass.hInstance = GetModuleHandleW(nullptr);
-    windowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-    windowClass.lpszClassName = kOverlayClassName;
+    if (GetClassNameEquals(window, L"SHELLDLL_DefView")) {
+        return 60000;
+    }
 
-    RegisterClassExW(&windowClass);
+    if (GetClassNameEquals(window, L"SysListView32")) {
+        return 50000;
+    }
+
+    if (GetClassNameEquals(window, L"DirectUIHWND")) {
+        return 25000;
+    }
+
+    if (GetClassNameEquals(window, L"UIItemsView")) {
+        return 25000;
+    }
+
+    return 0;
+}
+
+BOOL CALLBACK EnumNativeViewCandidates(HWND window, LPARAM param)
+{
+    NativeViewSearch& search =
+        *reinterpret_cast<NativeViewSearch*>(param);
+
+    if (window == search.toggle || !IsWindowVisible(window)) {
+        return TRUE;
+    }
+
+    const int classScore = GetNativeViewClassScore(window);
+    if (classScore == 0) {
+        return TRUE;
+    }
+
+    RECT rect;
+    RECT clientRect;
+    if (!GetWindowRect(window, &rect) ||
+        !GetClientRect(search.frame, &clientRect)) {
+        return TRUE;
+    }
+
+    POINT topLeft = {rect.left, rect.top};
+    POINT bottomRight = {rect.right, rect.bottom};
+    if (!ScreenToClient(search.frame, &topLeft) ||
+        !ScreenToClient(search.frame, &bottomRight)) {
+        return TRUE;
+    }
+
+    const int width = bottomRight.x - topLeft.x;
+    const int height = bottomRight.y - topLeft.y;
+    if (width < 160 || height < 100) {
+        return TRUE;
+    }
+
+    const int areaScore = (width * height) / 1000;
+    const int filePaneBias =
+        topLeft.x > clientRect.right / 4 ? 10000 : 0;
+    const int contentBias =
+        topLeft.y > 90 && topLeft.y < clientRect.bottom - 80 ? 5000 : 0;
+    const int score = classScore + filePaneBias + contentBias + areaScore;
+
+    if (score > search.bestScore) {
+        search.bestScore = score;
+        search.bestWindow = window;
+    }
+
+    return TRUE;
+}
+
+HWND FindNativeExplorerView(HWND frame, HWND toggle)
+{
+    NativeViewSearch search = {
+        frame,
+        toggle,
+        nullptr,
+        0,
+    };
+
+    EnumChildWindows(frame, EnumNativeViewCandidates,
+                     reinterpret_cast<LPARAM>(&search));
+    return search.bestWindow;
 }
 
 }  // namespace eef
@@ -345,8 +396,35 @@ void DestroyWindowState(ExplorerWindow& window)
         DestroyWindow(window.checkbox);
     }
 
-    if (IsWindow(window.emptyView)) {
-        DestroyWindow(window.emptyView);
+    if (window.nativeViewHidden && IsWindow(window.nativeView)) {
+        ShowWindow(window.nativeView, SW_SHOW);
+        window.nativeViewHidden = false;
+        window.nativeView = nullptr;
+    }
+}
+
+void SyncNativeViewVisibility(ExplorerWindow& window)
+{
+    if (!IsWindow(window.nativeView)) {
+        window.nativeView = FindNativeExplorerView(window.frame,
+                                                  window.checkbox);
+        window.nativeViewHidden = false;
+    }
+
+    if (!IsWindow(window.nativeView)) {
+        return;
+    }
+
+    const bool enabled = g_enabled.load();
+    if (enabled && !window.nativeViewHidden) {
+        ShowWindow(window.nativeView, SW_HIDE);
+        window.nativeViewHidden = true;
+        return;
+    }
+
+    if (!enabled && window.nativeViewHidden) {
+        ShowWindow(window.nativeView, SW_SHOW);
+        window.nativeViewHidden = false;
     }
 }
 
@@ -358,7 +436,7 @@ void LayoutWindowState(ExplorerWindow& window)
 
     if (!IsWindowVisible(window.frame) || IsIconic(window.frame)) {
         ShowWindow(window.checkbox, SW_HIDE);
-        ShowWindow(window.emptyView, SW_HIDE);
+        SyncNativeViewVisibility(window);
         return;
     }
 
@@ -385,30 +463,7 @@ void LayoutWindowState(ExplorerWindow& window)
         return;
     }
 
-    int overlayLeft = ScaleForWindow(window.frame, 435);
-    int overlayTop = ScaleForWindow(window.frame, 160);
-
-    if (overlayLeft > clientRect.right - ScaleForWindow(window.frame, 120)) {
-        overlayLeft = clientRect.right / 3;
-    }
-
-    if (overlayTop > clientRect.bottom - ScaleForWindow(window.frame, 120)) {
-        overlayTop = clientRect.bottom / 3;
-    }
-
-    overlayLeft = std::max(0, overlayLeft);
-    overlayTop = std::max(0, overlayTop);
-
-    const int overlayWidth = static_cast<int>(clientRect.right) - overlayLeft;
-    const int overlayHeight = static_cast<int>(clientRect.bottom) - overlayTop;
-    const bool enabled = g_enabled.load();
-    SetWindowPos(window.emptyView,
-                 HWND_TOP,
-                 overlayLeft,
-                 overlayTop,
-                 std::max(0, overlayWidth),
-                 std::max(0, overlayHeight),
-                 SWP_NOACTIVATE | (enabled ? SWP_SHOWWINDOW : SWP_HIDEWINDOW));
+    SyncNativeViewVisibility(window);
 
     SetWindowPos(window.checkbox,
                  HWND_TOP,
@@ -442,29 +497,12 @@ void AddExplorerWindow(HWND frame)
         return;
     }
 
-    HWND emptyView = CreateWindowExW(WS_EX_NOPARENTNOTIFY,
-                                     kOverlayClassName,
-                                     L"",
-                                     WS_CHILD | WS_CLIPSIBLINGS,
-                                     0,
-                                     0,
-                                     0,
-                                     0,
-                                     frame,
-                                     nullptr,
-                                     GetModuleHandleW(nullptr),
-                                     nullptr);
-    if (!emptyView) {
-        DestroyWindow(checkbox);
-        Wh_Log(L"Failed to create empty Explorer view for window %p", frame);
-        return;
-    }
-
     g_windows.push_back({
         frame,
         checkbox,
-        emptyView,
+        nullptr,
         g_enabled.load(),
+        false,
     });
 
     LayoutWindowState(g_windows.back());
@@ -527,7 +565,6 @@ namespace eef {
 
 DWORD WINAPI ManagerThreadProc(void*)
 {
-    RegisterEmptyViewClass();
     RegisterToggleControlClass();
 
     while (g_running.load()) {
@@ -554,7 +591,6 @@ DWORD WINAPI ManagerThreadProc(void*)
 
     g_windows.clear();
     UnregisterClassW(kToggleClassName, GetModuleHandleW(nullptr));
-    UnregisterClassW(kOverlayClassName, GetModuleHandleW(nullptr));
     return 0;
 }
 
