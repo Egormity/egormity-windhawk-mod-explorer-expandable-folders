@@ -1,0 +1,10 @@
+#include "windhawk_metadata.h"
+
+#include "common.h"
+#include "state.cpp"
+#include "window_utils.cpp"
+#include "native_view.cpp"
+#include "toggle_control.cpp"
+#include "explorer_window.cpp"
+#include "manager.cpp"
+#include "entrypoint.cpp"
